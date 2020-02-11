@@ -1,0 +1,6 @@
+#Arquitetura de organizaçao
+#node_modules
+node_modules/
+
+#arquitetura txt
+imoveis.xml
