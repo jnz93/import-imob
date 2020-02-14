@@ -52,14 +52,22 @@ class ImportImob {
     }
 
 
-    # READER XML TEXT TO OBJECT
-    public function reader_xml()
+    # EXTRACT DATA FOR XML OBJECT
+    public function xml_to_arr()
     {
-        # XML TEMPORÁRIO EM PRODUÇÃO
-        $temp_xml = require_once(plugin_dir_path(__FILE__) . 'imoveis.xml');
+        # URL TO GET XML
+        $configs_json       = file_get_contents(plugin_dir_path(__FILE__) . 'configs.json');
+        $json_obj           = json_decode($configs_json);
+        $load_xml_by_url    = $json_obj->url_xml; 
+        
+        # READER XML
+        $xml_to_obj         = simplexml_load_file($load_xml_by_url);
+        $arr_imoveis        = $xml_to_obj->Imoveis->Imovel;
 
-        return $temp_xml;
+        # RETURN ARRAY OF PROPERTIES
+        return $arr_imoveis;
     }
+
 }
 
 ImportImob::getInstance();
