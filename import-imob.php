@@ -190,6 +190,7 @@ class ImportImob {
             
             $properties_to_publish[$index]['ano_construcao']    = (string) $property->AnoConstrucao;
             $properties_to_publish[$index]['video_url']         = (string) $property->LinkVideo;
+            $properties_to_publish[$index]['codigo']            = (string) $property->CodigoImovel;
 
             # FEATURES
             $properties_to_publish[$index]['features']          = '';
@@ -225,6 +226,117 @@ class ImportImob {
 
         # RETURN COLECTION OF PROPERTIES
         return $properties_to_publish;
+    }
+
+    # READ PROPERTIES AND CREATE POSTS
+    public function publish_properties()
+    {
+        $properties = ImportImob::xml_data_to_collection_of_properties();
+
+
+        foreach ($properties as $property) :
+
+            # SETUP PROPERTY
+            $property_title         = $property['titulo'];
+            $property_description   = $property['descricao'];
+
+            $property_bedrooms      = $property['quartos'];
+            $property_bathrooms     = $property['banheiros'];
+            $property_garage        = $property['vagas'];
+            $property_size          = $property['area_util'];
+            $property_size_total    = $property['area_total'];
+            $property_size_postfix  = $property['und_metrica'];
+
+            $property_type          = $property['tipo_imovel'];
+            $property_subtype       = $property['subtipo_imovel'];
+            $property_function      = $property['finalidade'];
+            $property_category      = $property['categoria'];
+
+            $property_price         = $property['preco_venda'];
+            $property_price_sec     = $property['preco_locacao'];
+            $property_price_iptu    = $property['preco_iptu'];
+            $property_price_condon  = $property['preco_condominio'];
+            
+            $property_country       = $property['pais'];
+            $property_uf            = $property['estado'];
+            $property_city          = $property['cidade'];
+            $property_district      = $property['bairro'];
+            $property_zone          = $property['regiao'];
+            $property_street        = $property['rua'];
+            $property_number        = $property['numero'];
+            $property_cep           = $property['cep'];
+            $property_complement    = $property['complemento'];
+
+            $property_condon        = $property['nome_condominio'];
+            $property_building      = $property['nome_edificio'];
+            $property_construction  = $property['ano_construcao'];
+            $property_features      = $property['features'];
+
+            $property_video_url     = $property['video_url'];
+            $property_gallery       = $property['fotos'];
+            $property_code_id       = $property['codigo'];
+
+
+            # SETUP POST
+            $post_arr = array(
+                'post_type'     => 'property',
+                'post_title'    => $property_title,
+                'post_content'  => $property_description,
+                'post_author'   => get_current_user_id(),
+                'post_status'   => 'publish',
+            );
+
+            $post_id = wp_insert_post($post_arr, $wp_error);
+            
+
+            // $taxonomies = array(
+            //     'property_type', 
+            //     'property_status', 
+            //     'property_feature', 
+            //     'propert_label', 
+            //     'property_estate', 
+            //     'property_city', 
+            //     'property_area'
+            // );
+            // foreach ($taxonomies as $tax) :
+
+            //     wp_set_post_terms($post_id, $tags, $tax);
+                
+            // endforeach;
+
+            # SAVE THE TAXONOMIES
+            wp_set_object_terms($post_id, array($property_type), 'property_type');
+            wp_set_object_terms($post_id, array($property_features), 'property_feature');
+            wp_set_object_terms($post_id, array($property_uf), 'property_estate');
+            wp_set_object_terms($post_id, array($property_city), 'property_city');
+            wp_set_object_terms($post_id, array($property_district), 'property_area');
+
+            # SAVE METABOXES
+            update_post_meta($post_id, 'fave_property_price', $property_price);
+            update_post_meta($post_id, 'fave_property_sec_price', $property_price_sec);
+            update_post_meta($post_id, 'fave_property_size', $property_size);
+            update_post_meta($post_id, 'fave_property_size_prefix', $property_size_postfix);
+            update_post_meta($post_id, 'fave_property_land', $property_size_total);
+            update_post_meta($post_id, 'fave_property_bedrooms', $property_bedrooms);
+            update_post_meta($post_id, 'fave_property_bathrooms', $property_bathrooms);
+            update_post_meta($post_id, 'fave_property_garage', $property_garage);
+            update_post_meta($post_id, 'fave_property_year', $property_construction);
+            update_post_meta($post_id, 'fave_property_id', $property_code_id);
+            update_post_meta($post_id, 'fave_property_map_address', $property_street);
+            update_post_meta($post_id, 'fave_property_street', $property_street);
+            update_post_meta($post_id, 'fave_property_zip', $property_cep);
+            update_post_meta($post_id, 'fave_property_country', $property_country);
+            update_post_meta($post_id, 'fave_property_images', $property_gallery);
+            update_post_meta($post_id, 'fave_video_url', $property_video_url);
+
+
+            if (!is_wp_error($post_id)) :
+                echo 'Imóvel publicado com sucesso! ' . $post_id . '<br>';
+            else :
+                echo $post_id->get_error_message() . '<br>';
+            endif;
+
+        endforeach;
     }
 }
 
