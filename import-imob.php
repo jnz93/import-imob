@@ -276,6 +276,8 @@ class ImportImob {
             $property_gallery       = $property['fotos'];
             $property_code_id       = $property['codigo'];
 
+            # TRATAMENTO FEATURES
+            $property_features_arr  = explode(',', $property_features);
 
             # SETUP POST
             $post_arr = array(
@@ -306,7 +308,7 @@ class ImportImob {
 
             # SAVE THE TAXONOMIES
             wp_set_object_terms($post_id, array($property_type), 'property_type');
-            wp_set_object_terms($post_id, array($property_features), 'property_feature');
+            wp_set_object_terms($post_id, $property_features_arr, 'property_feature');
             wp_set_object_terms($post_id, array($property_uf), 'property_estate');
             wp_set_object_terms($post_id, array($property_city), 'property_city');
             wp_set_object_terms($post_id, array($property_district), 'property_area');
