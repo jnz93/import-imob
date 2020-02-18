@@ -100,7 +100,6 @@ class ImportImob {
         require_once(plugin_dir_path(__FILE__) . '/views/setup-plugin.php');
     }
 
-
     # EXTRACT DATA FOR XML OBJECT
     public function xml_to_arr()
     {
@@ -202,8 +201,8 @@ class ImportImob {
         $index = 0;
         foreach ($arr_properties as $property) :
             
-            $properties_to_publish[$index]['titulo']            = (string) $property->TituloImovel;
-            $properties_to_publish[$index]['descricao']         = (string) $property->Observacao;
+            $properties_to_publish[$index]['titulo']            = utf8_decode((string) $property->TituloImovel);
+            $properties_to_publish[$index]['descricao']         = utf8_decode((string) $property->Observacao);
             
             $properties_to_publish[$index]['quartos']           = (string) $property->QtdDormitorios;
             $properties_to_publish[$index]['suites']            = (string) $property->QtdSuites;
@@ -216,10 +215,10 @@ class ImportImob {
             $properties_to_publish[$index]['area_privativa']    = (string) $property->AreaPrivativa;
             $properties_to_publish[$index]['und_metrica']       = (string) $property->UnidadeMetrica;
             
-            $properties_to_publish[$index]['tipo_imovel']       = (string) $property->TipoImovel;
-            $properties_to_publish[$index]['subtipo_imovel']    = (string) $property->SubTipoImovel;
-            $properties_to_publish[$index]['finalidade']        = (string) $property->Finalidade;
-            $properties_to_publish[$index]['categoria']         = (string) $property->CategoriaImovel;
+            $properties_to_publish[$index]['tipo_imovel']       = utf8_decode((string) $property->TipoImovel);
+            $properties_to_publish[$index]['subtipo_imovel']    = utf8_decode((string) $property->SubTipoImovel);
+            $properties_to_publish[$index]['finalidade']        = utf8_decode((string) $property->Finalidade);
+            $properties_to_publish[$index]['categoria']         = utf8_decode((string) $property->CategoriaImovel);
             
             $properties_to_publish[$index]['preco_venda']       = (string) $property->PrecoVenda;
             $properties_to_publish[$index]['preco_locacao']     = (string) $property->PrecoLocacao;
@@ -227,17 +226,17 @@ class ImportImob {
             $properties_to_publish[$index]['preco_iptu']        = (string) $property->PrecoIptu;
             $properties_to_publish[$index]['preco_condominio']  = (string) $property->PrecoCondominio;
 
-            $properties_to_publish[$index]['pais']              = (string) $property->Pais;
-            $properties_to_publish[$index]['estado']            = (string) $property->Estado;
-            $properties_to_publish[$index]['cidade']            = (string) $property->Cidade;
-            $properties_to_publish[$index]['bairro']            = (string) $property->Bairro;
-            $properties_to_publish[$index]['regiao']            = (string) $property->Regiao;
-            $properties_to_publish[$index]['rua']               = (string) $property->Endereco;
+            $properties_to_publish[$index]['pais']              = utf8_decode((string) $property->Pais);
+            $properties_to_publish[$index]['estado']            = utf8_decode((string) $property->Estado);
+            $properties_to_publish[$index]['cidade']            = utf8_decode((string) $property->Cidade);
+            $properties_to_publish[$index]['bairro']            = utf8_decode((string) $property->Bairro);
+            $properties_to_publish[$index]['regiao']            = utf8_decode((string) $property->Regiao);
+            $properties_to_publish[$index]['rua']               = utf8_decode((string) $property->Endereco);
             $properties_to_publish[$index]['numero']            = (string) $property->Numero;
             $properties_to_publish[$index]['cep']               = (string) $property->CEP;
-            $properties_to_publish[$index]['complemento']       = (string) $property->ComplementoEndereco;
-            $properties_to_publish[$index]['nome_condominio']   = (string) $property->NomeCondominio;
-            $properties_to_publish[$index]['nome_edificio']     = (string) $property->NomeEdificio;
+            $properties_to_publish[$index]['complemento']       = utf8_decode((string) $property->ComplementoEndereco);
+            $properties_to_publish[$index]['nome_condominio']   = utf8_decode((string) $property->NomeCondominio);
+            $properties_to_publish[$index]['nome_edificio']     = utf8_decode((string) $property->NomeEdificio);
             $properties_to_publish[$index]['latitude']          = (string) $property->latitude;
             $properties_to_publish[$index]['longitude']         = (string) $property->longitude;
             
@@ -251,7 +250,7 @@ class ImportImob {
                 # 0 = false / 1 = true
                 if ((string) $property->$feature == '1') :
 
-                    $properties_to_publish[$index]['features'] .= $feature . ', ';
+                    $properties_to_publish[$index]['features'] .= utf8_decode($feature) . ', ';
 
                 endif;
 
