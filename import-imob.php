@@ -36,6 +36,7 @@ class ImportImob {
     private function __construct()
     {
         add_action('admin_menu', array($this, 'create_menu'));
+        add_action('admin_init', array($this, 'register_settings_options'));
         #add_action('admin_enqueue_scripts', array($this, 'register_and_enqueue_scripts'));
     }
 
@@ -44,6 +45,47 @@ class ImportImob {
     {
         add_menu_page('Imob Import', 'ImobImport', 'administrator', 'imob-import', 'ImportImob::imob_admin_page', 'dashicons-admin-multisite', 65);
         add_submenu_page('imob-import', 'Configurações do plugin', 'Configurações', 10, 'setup-plugin', 'ImportImob::imob_settings');
+    }
+
+    # REGISTER SETTINGS OPTIONS
+    public function register_settings_options()
+    {
+        $option_group   = 'imob-import-settings';
+
+        register_setting($option_group, PREFIX . '_timestamp');
+        register_setting($option_group, PREFIX . '_url_load');
+    }
+
+    # FORM FOR SETTINGS INPUTS
+    public function plugin_settings_options()
+    {
+        if (!current_user_can('administrator')) :
+            wp_die(__('Você não tem permissão para acessar essa página.', 'TEXT_DOMAIN'));
+        endif;
+
+        $curr_timestamp     = get_option(PREFIX . '_timestamp');
+        $curr_url_load      = get_option(PREFIX . '_url_load');
+
+        ?>
+        <form method="post" action="options.php" class="row col-lg-8 settingsPage__form">
+            <?php 
+            settings_fields('imob-import-settings'); 
+            do_settings_sections('imob-import-settings');
+            ?>
+
+            <div class="col-lg-4 settingsPage__wrapInput">
+                <label for="<?php echo PREFIX . '_timestamp' ?>" class="">Intervalo de execução</label>
+                <input type="text" id="<?php echo PREFIX . '_timestamp' ?>" name="<?php echo PREFIX . '_timestamp' ?>" class="" placeholder="" value="<?php echo ( empty($curr_timestamp) ? '' : $curr_timestamp ) ?>">
+            </div>
+
+            <div class="col-lg-4 settingsPage__wrapInput">
+                <label for="<?php echo PREFIX . '_url_load' ?>" class="">URL de Carga Imob Ingaia</label>
+                <input type="text" id="<?php echo PREFIX . '_url_load' ?>" name="<?php echo PREFIX . '_url_load' ?>" class="" placeholder="" value="<?php echo ( empty($curr_url_load) ? '' : $curr_url_load ) ?>">
+            </div>
+            <?php submit_button(); ?>
+        </form>
+
+        <?php
     }
 
     # VIEW HOME PAGE
@@ -73,6 +115,10 @@ class ImportImob {
 
         # RETURN ARRAY OF PROPERTIES
         return $arr_imoveis;
+
+        // echo '<pre>';
+        // print_r($arr_imoveis);
+        // echo '<pre>';
     }
 
     # READ XML DATA AND RETURN COLLECTION OF PROPERTIES
