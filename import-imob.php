@@ -43,12 +43,19 @@ class ImportImob {
     public function create_menu()
     {
         add_menu_page('Imob Import', 'ImobImport', 'administrator', 'imob-import', 'ImportImob::imob_admin_page', 'dashicons-admin-multisite', 65);
+        add_submenu_page('imob-import', 'Configurações do plugin', 'Configurações', 10, 'setup-plugin', 'ImportImob::imob_settings');
     }
 
-    # VIEW RENDER PAGE
+    # VIEW HOME PAGE
     public function imob_admin_page()
     {
-        require_once(plugin_dir_path(__FILE__) . '/views/settings-page.php');
+        require_once(plugin_dir_path(__FILE__) . '/views/home-plugin.php');
+    }
+
+    # VIEW SETTINGS PAGE
+    public function imob_settings()
+    {
+        require_once(plugin_dir_path(__FILE__) . '/views/setup-plugin.php');
     }
 
 
