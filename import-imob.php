@@ -37,6 +37,10 @@ class ImportImob {
     {
         add_action('admin_menu', array($this, 'create_menu'));
         add_action('admin_init', array($this, 'register_settings_options'));
+
+        # CRON JOB
+        add_filter('cron_schedules', array($this, 'setup_cronjob_interval'));
+        add_action('cron_publish_properties', array($this, 'publish_properties'));
         #add_action('admin_enqueue_scripts', array($this, 'register_and_enqueue_scripts'));
     }
 
@@ -118,6 +122,9 @@ class ImportImob {
         // echo '<pre>';
         // print_r($arr_imoveis);
         // echo '<pre>';
+        // echo utf8_decode($arr_imoveis->TituloImovel) . '<br>';
+        // echo utf8_decode($arr_imoveis->CategoriaImovel) . '<br>';
+        // echo utf8_decode($arr_imoveis->Cidade) . '<br>';
     }
 
     # READ XML DATA AND RETURN COLLECTION OF PROPERTIES
@@ -392,6 +399,20 @@ class ImportImob {
 
         endforeach;
     }
+
+    # SETUP CRONJOB INTERVAL AND EXECUTION
+    public function setup_cronjob_interval($schedules)
+    {
+        $custom_interval    = get_option(PREFIX . '_timestamp');
+
+        $schedules['custom_interval'] = array(
+            'interval'  => $custom_interval,
+            'display'   => esc_html__( 'Every ' . $custom_interval . ' seconds.' ),
+        );
+        
+        return $schedules;
+    }
+
 }
 
 ImportImob::getInstance();
