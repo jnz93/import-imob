@@ -107,14 +107,16 @@ class ImportImob {
     # EXTRACT DATA FOR XML OBJECT
     public function xml_to_arr()
     {
-        # URL TO GET XML
-        $configs_json       = file_get_contents(plugin_dir_path(__FILE__) . 'configs.json');
-        $json_obj           = json_decode($configs_json);
-        $load_xml_by_url    = $json_obj->url_xml; 
+        # LOAD XML
+        $imob_xml_url       = get_option(PREFIX . '_url_load');
+        $load_xml_by_url    = $imob_xml_url;
         
-        # READER XML
-        $xml_to_obj         = simplexml_load_file($load_xml_by_url);
-        $arr_imoveis        = $xml_to_obj->Imoveis->Imovel;
+        if (!empty($load_xml_by_url)) :
+            $xml_to_obj         = simplexml_load_file($load_xml_by_url);
+            $arr_imoveis        = $xml_to_obj->Imoveis->Imovel;
+        else :
+            wp_die('URL de download do XML não configurada.');
+        endif;
 
         # RETURN ARRAY OF PROPERTIES
         return $arr_imoveis;
