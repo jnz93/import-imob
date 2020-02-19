@@ -228,6 +228,7 @@ class ImportImob {
             $properties_to_publish[$index]['subtipo_imovel']    = utf8_decode((string) $property->SubTipoImovel);
             $properties_to_publish[$index]['finalidade']        = utf8_decode((string) $property->Finalidade);
             $properties_to_publish[$index]['categoria']         = utf8_decode((string) $property->CategoriaImovel);
+            $properties_to_publish[$index]['acao']              = utf8_decode((string) $property->PublicaValores);
             
             $properties_to_publish[$index]['preco_venda']       = (string) $property->PrecoVenda;
             $properties_to_publish[$index]['preco_locacao']     = (string) $property->PrecoLocacao;
@@ -447,6 +448,80 @@ class ImportImob {
         return $published_ids;    
     }
 
+    # LOGS DA CARGA
+    public function log_load_properties()
+    {
+        $properties_arr     = ImportImob::xml_data_to_collection_of_properties();
+        $prop_total         = count($properties_arr);
+
+        $apartments             = array(); # Apartamentos
+        $lands                  = array(); # Terrenos
+        $houses                 = array(); # Casas
+        $roofing                = array(); # Coberturas
+        $commercial_room        = array(); # Salas comerciais
+        $properties_for_sale    = array(); # Propriedades a venda
+        $properties_for_rent    = array(); # Propriedades para alugar
+
+        if (!empty($properties_arr)) :
+            foreach($properties_arr as $property) :
+                # VERIFICAÇÃO DE TIPOS
+                if ($property['tipo_imovel'] == "Apartamento") :
+                    # APARTAMENTOS
+                    $apartments[] = $property['codigo'];
+                
+                elseif ($property['tipo_imovel'] == 'Casa') :
+                    # CASAS
+                    $houses[] = $property['codigo'];
+
+                elseif ($property['tipo_imovel'] == 'Cobertura') :
+                    # COBERTURAS
+                    $roofing[] = $property['codigo'];
+
+                elseif ($property['tipo_imovel'] == 'Terreno') :
+                    # TERRENOS
+                    $lands[] = $property['codigo'];
+
+                elseif ($property['tipo_imovel'] == 'Ponto' || $property['tipo_imovel'] == 'Prédio' || $property['tipo_imovel'] == 'Sala' || $property['tipo_imovel'] == 'Salão' || $property['tipo_imovel'] == 'Andar Corporativo' || $property['tipo_imovel'] == 'Área' || $property['tipo_imovel'] == 'Loja') :
+                    # COMERCIAIS
+                    $commercial_room[] = $property['codigo'];
+
+                endif;
+
+                // 1 - Publicar venda e locação
+                // 2 - Publicar somente venda
+                // 3 - Publicar somente locação
+                // 4 - Não publicar valores
+
+                # VERIFICAÇÃO DE AÇÃO
+                if ($property['acao'] == 1) :
+                    # VENDA E LOCAOÇÃO
+                    $properties_for_sale[] = $property['codigo'];
+                    $properties_for_rent[] = $property['codigo'];
+                
+                elseif ($property['acao'] == 2) :
+                    # SOMENTE VENDA
+                    $properties_for_sale[] = $property['codigo'];
+                
+                elseif ($property['acao'] == 3) :
+                    # SOMENTE LOCAÇÃO
+                    $properties_for_rent[] = $property['codigo'];
+
+                endif;
+            endforeach;
+        endif;
+
+        $card_total_properties = '';
+
+        // echo $prop_total;
+        echo 'DADOS DA ÚLTIMA IMPORTAÇÃO: <br>';
+        echo "TOTAL DE APARTAMENTOS: " . count($apartments) . '<br>';
+        echo "TOTAL DE CASAS: " . count($houses) . '<br>';
+        echo "TOTAL DE COBERTURAS: " . count($roofing) . '<br>';
+        echo "TOTAL DE TERRENOS: " . count($lands) . '<br>';
+        echo "TOTAL DE PONTOS COMERCIAIS: " . count($commercial_room) . '<br>';
+        echo "TOTAL DE IMÓVEIS Á VENDA: " . count($properties_for_sale) . '<br>';
+        echo "TOTAL DE IMÓVEIS PARA LOCAÇÃO: " . count($properties_for_rent) . '<br>';
+    }
 }
 
 ImportImob::getInstance();
