@@ -292,8 +292,8 @@ class ImportImob {
     # READ PROPERTIES AND CREATE POSTS
     public function publish_properties()
     {
-        $properties = ImportImob::xml_data_to_collection_of_properties();
-
+        $properties     = ImportImob::xml_data_to_collection_of_properties();
+        $published_ids  = ImportImob::check_properties_duplicity();
 
         foreach ($properties as $property) :
 
@@ -340,63 +340,67 @@ class ImportImob {
             # TRATAMENTO FEATURES
             $property_features_arr  = explode(',', $property_features);
 
-            # SETUP POST
-            $post_arr = array(
-                'post_type'     => 'property',
-                'post_title'    => $property_title,
-                'post_content'  => $property_description,
-                'post_author'   => get_current_user_id(),
-                'post_status'   => 'publish',
-            );
+            if (!in_array($property_code_id, $published_ids)) :
 
-            $post_id = wp_insert_post($post_arr, $wp_error);
-            
+                # SETUP POST
+                $post_arr = array(
+                    'post_type'     => 'property',
+                    'post_title'    => $property_title,
+                    'post_content'  => $property_description,
+                    'post_author'   => get_current_user_id(),
+                    'post_status'   => 'publish',
+                );
 
-            // $taxonomies = array(
-            //     'property_type', 
-            //     'property_status', 
-            //     'property_feature', 
-            //     'propert_label', 
-            //     'property_estate', 
-            //     'property_city', 
-            //     'property_area'
-            // );
-            // foreach ($taxonomies as $tax) :
-
-            //     wp_set_post_terms($post_id, $tags, $tax);
+                $post_id = wp_insert_post($post_arr, $wp_error);
                 
-            // endforeach;
 
-            # SAVE THE TAXONOMIES
-            wp_set_object_terms($post_id, array($property_type), 'property_type');
-            wp_set_object_terms($post_id, $property_features_arr, 'property_feature');
-            wp_set_object_terms($post_id, array($property_uf), 'property_estate');
-            wp_set_object_terms($post_id, array($property_city), 'property_city');
-            wp_set_object_terms($post_id, array($property_district), 'property_area');
+                // $taxonomies = array(
+                //     'property_type', 
+                //     'property_status', 
+                //     'property_feature', 
+                //     'propert_label', 
+                //     'property_estate', 
+                //     'property_city', 
+                //     'property_area'
+                // );
+                // foreach ($taxonomies as $tax) :
 
-            # SAVE METABOXES
-            update_post_meta($post_id, 'fave_property_price', $property_price);
-            update_post_meta($post_id, 'fave_property_sec_price', $property_price_sec);
-            update_post_meta($post_id, 'fave_property_size', $property_size);
-            update_post_meta($post_id, 'fave_property_size_prefix', $property_size_postfix);
-            update_post_meta($post_id, 'fave_property_land', $property_size_total);
-            update_post_meta($post_id, 'fave_property_bedrooms', $property_bedrooms);
-            update_post_meta($post_id, 'fave_property_bathrooms', $property_bathrooms);
-            update_post_meta($post_id, 'fave_property_garage', $property_garage);
-            update_post_meta($post_id, 'fave_property_year', $property_construction);
-            update_post_meta($post_id, 'fave_property_id', $property_code_id);
-            update_post_meta($post_id, 'fave_property_map_address', $property_street);
-            update_post_meta($post_id, 'fave_property_street', $property_street);
-            update_post_meta($post_id, 'fave_property_zip', $property_cep);
-            update_post_meta($post_id, 'fave_property_country', $property_country);
-            update_post_meta($post_id, 'fave_property_images', $property_gallery);
-            update_post_meta($post_id, 'fave_video_url', $property_video_url);
+                //     wp_set_post_terms($post_id, $tags, $tax);
+                    
+                // endforeach;
+
+                # SAVE THE TAXONOMIES
+                wp_set_object_terms($post_id, array($property_type), 'property_type');
+                wp_set_object_terms($post_id, $property_features_arr, 'property_feature');
+                wp_set_object_terms($post_id, array($property_uf), 'property_estate');
+                wp_set_object_terms($post_id, array($property_city), 'property_city');
+                wp_set_object_terms($post_id, array($property_district), 'property_area');
+
+                # SAVE METABOXES
+                update_post_meta($post_id, 'fave_property_price', $property_price);
+                update_post_meta($post_id, 'fave_property_sec_price', $property_price_sec);
+                update_post_meta($post_id, 'fave_property_size', $property_size);
+                update_post_meta($post_id, 'fave_property_size_prefix', $property_size_postfix);
+                update_post_meta($post_id, 'fave_property_land', $property_size_total);
+                update_post_meta($post_id, 'fave_property_bedrooms', $property_bedrooms);
+                update_post_meta($post_id, 'fave_property_bathrooms', $property_bathrooms);
+                update_post_meta($post_id, 'fave_property_garage', $property_garage);
+                update_post_meta($post_id, 'fave_property_year', $property_construction);
+                update_post_meta($post_id, 'fave_property_id', $property_code_id);
+                update_post_meta($post_id, 'fave_property_map_address', $property_street);
+                update_post_meta($post_id, 'fave_property_street', $property_street);
+                update_post_meta($post_id, 'fave_property_zip', $property_cep);
+                update_post_meta($post_id, 'fave_property_country', $property_country);
+                update_post_meta($post_id, 'fave_property_images', $property_gallery);
+                update_post_meta($post_id, 'fave_video_url', $property_video_url);
 
 
-            if (!is_wp_error($post_id)) :
-                echo 'Imóvel publicado com sucesso! ' . $post_id . '<br>';
-            else :
-                echo $post_id->get_error_message() . '<br>';
+                if (!is_wp_error($post_id)) :
+                    echo 'Imóvel publicado com sucesso! ' . $post_id . '<br>';
+                else :
+                    echo $post_id->get_error_message() . '<br>';
+                endif;
+
             endif;
 
         endforeach;
@@ -413,6 +417,34 @@ class ImportImob {
         );
         
         return $schedules;
+    }
+
+    # CHECK DUPLICITY
+    public function check_properties_duplicity()
+    {
+        # QUERY DAS PUBLICAÇÕES
+        $args = array(
+            'post_type'         => 'property',
+            'posts_per_page'    => -1,
+            'post_status'       => 'publish'
+        );
+        $properties_published = new WP_Query($args);
+
+        # COLETA DOS IDS PUBLICADOS
+        $published_ids = array();
+        if ($properties_published->have_posts()) :
+            while ($properties_published->have_posts()) :
+                $properties_published->the_post();
+                $post_id = get_the_ID();
+                $property_id = get_post_meta($post_id, 'fave_property_id', true);
+
+                $published_ids[] = $property_id;
+
+            endwhile;            
+        endif;
+
+        # RETORNO IDS PUBLICADOS
+        return $published_ids;    
     }
 
 }
