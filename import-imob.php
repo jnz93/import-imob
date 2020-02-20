@@ -328,6 +328,7 @@ class ImportImob {
             $property_number        = $property['numero'];
             $property_cep           = $property['cep'];
             $property_complement    = $property['complemento'];
+            $property_full_address  = $property_street . ', '. $property_number . ', ' . $property_district . ', ' . $property_city . ' - ' . $property_uf;
 
             $property_condon        = $property['nome_condominio'];
             $property_building      = $property['nome_edificio'];
@@ -388,7 +389,7 @@ class ImportImob {
                 update_post_meta($post_id, 'fave_property_garage', $property_garage);
                 update_post_meta($post_id, 'fave_property_year', $property_construction);
                 update_post_meta($post_id, 'fave_property_id', $property_code_id);
-                update_post_meta($post_id, 'fave_property_map_address', $property_street);
+                update_post_meta($post_id, 'fave_property_map_address', $property_full_address);
                 update_post_meta($post_id, 'fave_property_street', $property_street);
                 update_post_meta($post_id, 'fave_property_zip', $property_cep);
                 update_post_meta($post_id, 'fave_property_country', $property_country);
