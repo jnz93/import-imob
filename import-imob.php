@@ -403,8 +403,12 @@ class ImportImob {
                 $attachs_ids        .= $attach_id . ', ';
             endif;
         endforeach;
-        // echo $attachs_ids . '<br>';
         update_post_meta($post_id, 'fave_property_images', $attachs_ids);
+
+        # SET THUMBNAIL
+        $attachs_arr = explode(', ', $attachs_ids);
+        $thumbnail_id = $attachs_arr[0];        
+        set_post_thumbnail($post_id, $thumbnail_id);
     }
 
     
@@ -416,7 +420,13 @@ class ImportImob {
             $file = array();
             $file['name'] = $url;
             $file['tmp_name'] = download_url($url);
-     
+            
+            # FIX EXTENSAO > JPG
+            $pos = strpos($file['name'], '=w1024-h768');
+            if ($pos != false) :
+                $file['name'] = substr_replace($file['name'], '.jpg', $pos);
+            endif;
+
             if (is_wp_error($file['tmp_name'])) {
                 @unlink($file['tmp_name']);
                 var_dump( $file['tmp_name']->get_error_messages( ) );
