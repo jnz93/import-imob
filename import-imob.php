@@ -58,6 +58,7 @@ class ImportImob {
 
         register_setting($option_group, PREFIX . '_timestamp');
         register_setting($option_group, PREFIX . '_url_load');
+        register_setting($option_group, PREFIX . '_imgs_total');
     }
 
     # FORM FOR SETTINGS INPUTS
@@ -69,6 +70,7 @@ class ImportImob {
 
         $curr_timestamp     = get_option(PREFIX . '_timestamp');
         $curr_url_load      = get_option(PREFIX . '_url_load');
+        $curr_imgs_total    = get_option(PREFIX . '_imgs_total');
 
         ?>
         <form method="post" action="options.php" class="row col-lg-8 settingsPage__form">
@@ -85,6 +87,12 @@ class ImportImob {
             <div class="col-lg-4 settingsPage__wrapInput">
                 <label for="<?php echo PREFIX . '_url_load' ?>" class="">URL de Carga Imob Ingaia</label>
                 <input type="text" id="<?php echo PREFIX . '_url_load' ?>" name="<?php echo PREFIX . '_url_load' ?>" class="" placeholder="" value="<?php echo ( empty($curr_url_load) ? '' : $curr_url_load ) ?>">
+            </div>
+
+            <div class="col-lg-4 settingsPage__wrapInput">
+                <label for="<?php echo PREFIX . '_imgs_total' ?>" class="">Fotos por propriedade <i>Porque isso?</i></label>
+                <input type="text" id="<?php echo PREFIX . '_imgs_total' ?>" name="<?php echo PREFIX . '_imgs_total' ?>" class="" placeholder="" value="<?php echo ( empty($curr_imgs_total) ? '' : $curr_imgs_total ) ?>">
+                <span class="">Quanto maior o número de imagens processadas maior o uso e gasto de recursos da hospedagem podendo chegar a exaustão e queda.</span>
             </div>
             <?php submit_button(); ?>
         </form>
@@ -120,13 +128,6 @@ class ImportImob {
 
         # RETURN ARRAY OF PROPERTIES
         return $arr_imoveis;
-
-        // echo '<pre>';
-        // print_r($arr_imoveis);
-        // echo '<pre>';
-        // echo utf8_decode($arr_imoveis->TituloImovel) . '<br>';
-        // echo utf8_decode($arr_imoveis->CategoriaImovel) . '<br>';
-        // echo utf8_decode($arr_imoveis->Cidade) . '<br>';
     }
 
     # READ XML DATA AND RETURN COLLECTION OF PROPERTIES
@@ -394,8 +395,13 @@ class ImportImob {
     # SET IMAGES TO PROPERTIES BY ID
     public function set_images_properties($property_gallery, $post_id)
     {
+        $max_images             = get_option(PREFIX . '_imgs_total');
+        if (empty($max_images)) :
+            $max_images = 2;
+        endif;
+
         $arr_url_imgs           = explode(', ', $property_gallery); # STRING > ARRAY
-        $arr_url_imgs           = array_slice($arr_url_imgs, 0, 2); # LIMITE DE IMAGENS
+        $arr_url_imgs           = array_slice($arr_url_imgs, 0, $max_images); # LIMITE DE IMAGENS
         $attachs_ids            = '';
         foreach ($arr_url_imgs as $url) :
             $attach_id          = ImportImob::upload_image(trim($url), $post_id);
