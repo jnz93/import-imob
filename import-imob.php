@@ -42,6 +42,9 @@ class ImportImob {
         add_filter('cron_schedules', array($this, 'setup_cronjob_interval'));
         add_action('cron_publish_properties', array($this, 'publish_properties'));
         #add_action('admin_enqueue_scripts', array($this, 'register_and_enqueue_scripts'));
+
+        # ENQUEUE AWESOME FONTS
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts_admin'));
     }
 
     # MENU WORDPRESS
@@ -49,6 +52,13 @@ class ImportImob {
     {
         add_menu_page('Imob Import', 'ImobImport', 'administrator', 'imob-import', 'ImportImob::imob_admin_page', 'dashicons-admin-multisite', 65);
         add_submenu_page('imob-import', 'Configurações do plugin', 'Configurações', 10, 'setup-plugin', 'ImportImob::imob_settings');
+    }
+
+    # ENQUEUE SCRIPT IN ADMIN PANEL
+    public function enqueue_scripts_admin()
+    {
+        wp_register_script('awesome-icons', 'https://kit.fontawesome.com/f18f521cf8.js', array('crossorigin' => 'anonymous'));
+        wp_enqueue_script('awesome-icons');
     }
 
     # REGISTER SETTINGS OPTIONS
