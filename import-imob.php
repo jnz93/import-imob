@@ -57,7 +57,7 @@ class ImportImob {
     # ENQUEUE SCRIPT IN ADMIN PANEL
     public function enqueue_scripts_admin()
     {
-        wp_register_script('awesome-icons', 'https://kit.fontawesome.com/f18f521cf8.js', array('crossorigin' => 'anonymous'));
+        wp_register_script('awesome-icons', 'https://kit.fontawesome.com/f18f521cf8.js', array());
         wp_enqueue_script('awesome-icons');
     }
 
