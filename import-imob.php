@@ -83,27 +83,124 @@ class ImportImob {
         $curr_imgs_total    = get_option(PREFIX . '_imgs_total');
 
         ?>
+        <!-- JS -->
+        <script type="text/javascript">
+            jQuery('document').ready(function(){
+                // Setar o selecionado
+                var input = jQuery('#import_imob_timestamp');
+                var spans = jQuery('.span-select');
+
+                spans.each(function(index){
+                    let currEl = jQuery(this);
+                    let spanVal = currEl.attr('value');
+                    // console.log(index + " : " + jQuery(this).attr('value') + ' : ' + input.val());
+                    
+                    if (spanVal == input.val())
+                    {
+                        currEl.css({
+                            'background' : '#FBC02D'
+                        });
+                    }
+                });
+            });
+
+            //  SETAR TEMPO PRÉ DEFINIDO
+            function insertTime(el){
+                var input = jQuery('#import_imob_timestamp');
+                var value = el.attr('value');
+                input.val(value);
+                el.css({
+                    // 'border' : '2px solid red'
+                    'background' : '#FBC02D'
+                });
+
+                el.siblings().css({
+                    // 'border' : 'none'
+                    'background' : '#607D8B'
+                });
+            }
+
+            // ABRIR TEXTO DE AJUDA
+            function helpText(el)
+            {
+                el.siblings('.help-text').toggleClass('help-text-active');
+            }
+        </script>
+
+        <!-- CSS -->
+        <style>
+            .regular-description{
+                width: 100%; display: block; margin: 4px 0;
+            }
+            
+            .span-select{
+                background: #607D8B; color: #ffffff; margin: 0 4px; padding: 8px; border-radius: 4px; cursor: pointer;
+            }
+
+            .btn-help{
+                font-size: 16px; color: #212121; margin: 0 4px; cursor: pointer;
+            }
+
+            .help-text{
+                display: none; position: absolute; background: #FBC02D; font-size: 13px; color: #212121; padding: 8px; margin-top: 8px; border-radius: 4px;
+            }
+            .help-text-active{
+                display: block;
+            }
+            tr{
+                margin: 24px 0; display: block;
+            }
+        </style>
+
+        <h3>Configurações Gerais</h3>
         <form method="post" action="options.php" class="row col-lg-8 settingsPage__form">
             <?php 
             settings_fields('imob-import-settings'); 
             do_settings_sections('imob-import-settings');
             ?>
-
-            <div class="col-lg-4 settingsPage__wrapInput">
-                <label for="<?php echo PREFIX . '_timestamp' ?>" class="">Intervalo de execução</label>
-                <input type="text" id="<?php echo PREFIX . '_timestamp' ?>" name="<?php echo PREFIX . '_timestamp' ?>" class="" placeholder="" value="<?php echo ( empty($curr_timestamp) ? '' : $curr_timestamp ) ?>">
-            </div>
-
-            <div class="col-lg-4 settingsPage__wrapInput">
-                <label for="<?php echo PREFIX . '_url_load' ?>" class="">URL de Carga Imob Ingaia</label>
-                <input type="text" id="<?php echo PREFIX . '_url_load' ?>" name="<?php echo PREFIX . '_url_load' ?>" class="" placeholder="" value="<?php echo ( empty($curr_url_load) ? '' : $curr_url_load ) ?>">
-            </div>
-
-            <div class="col-lg-4 settingsPage__wrapInput">
-                <label for="<?php echo PREFIX . '_imgs_total' ?>" class="">Fotos por propriedade <i>Porque isso?</i></label>
-                <input type="text" id="<?php echo PREFIX . '_imgs_total' ?>" name="<?php echo PREFIX . '_imgs_total' ?>" class="" placeholder="" value="<?php echo ( empty($curr_imgs_total) ? '' : $curr_imgs_total ) ?>">
-                <span class="">Quanto maior o número de imagens processadas maior o uso e gasto de recursos da hospedagem podendo chegar a exaustão e queda.</span>
-            </div>
+            <table class="form-table" role="presentation">
+                <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo PREFIX . '_timestamp' ?>">Intervalo de execução</label>
+                            <i style="display: block">Em segundos</i>
+                        </th>
+                        <td>
+                            <input type="text" id="<?php echo PREFIX . '_timestamp' ?>" name="<?php echo PREFIX . '_timestamp' ?>" class="regular-text" placeholder="" value="<?php echo ( empty($curr_timestamp) ? '' : $curr_timestamp ) ?>">
+                            
+                            <p class="regular-description">Selecione o tempo de execução pré-definido</p>
+                            <div class="" style="display: flex; flex-wrap: wrap;">
+                                <span class="span-select" onClick="insertTime(jQuery(this))" value="14400">14.400s (4 Horas)</span>
+                                <span class="span-select" onClick="insertTime(jQuery(this))" value="28800">28.800s (8 Horas)</span>
+                                <span class="span-select" onClick="insertTime(jQuery(this))" value="43200">43.200s (12 Horas)</span>
+                                <span class="span-select" onClick="insertTime(jQuery(this))" value="57600">57.600s (16 Horas)</span>
+                                <span class="span-select" onClick="insertTime(jQuery(this))" value="72000">72.000s (20 Horas)</span>
+                                <span class="span-select" onClick="insertTime(jQuery(this))" value="86400">86.400s (24 Horas)</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo PREFIX . '_url_load' ?>">URL de integração Imob</label>
+                        </th>
+                        <td>
+                            <input type="url" id="<?php echo PREFIX . '_url_load' ?>" name="<?php echo PREFIX . '_url_load' ?>" class="regular-text" placeholder="" value="<?php echo ( empty($curr_url_load) ? '' : $curr_url_load ) ?>">
+                            <i onClick="helpText(jQuery(this))" class="btn-help fas fa-question-circle" title="Clique para obter ajuda"></i>
+                            <span class="help-text">Está com dúvidas? <a href="https://www.loom.com/share/bb42f79e918244609068ffb21b5e97e1" target="_blank">assista esse vídeo</a> e veja como configurar a exportação para o site e pegar a URL de integração.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo PREFIX . '_imgs_total' ?>">Fotos por Imóvel</label>
+                        </th>
+                        <td>
+                            <input type="number" id="<?php echo PREFIX . '_imgs_total' ?>" name="<?php echo PREFIX . '_imgs_total' ?>" class="regular-text" placeholder="" value="<?php echo ( empty($curr_imgs_total) ? '' : $curr_imgs_total ) ?>">
+                            <i onClick="helpText(jQuery(this))" class="btn-help fas fa-question-circle" title="Clique para obter ajuda"></i>
+                            <span class="help-text">Quanto maior o número de imagens processadas maior o uso e gasto de recursos da hospedagem podendo chegar a exaustão e queda.</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <?php submit_button(); ?>
         </form>
 
