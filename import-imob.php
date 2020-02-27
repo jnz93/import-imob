@@ -401,102 +401,115 @@ class ImportImob {
     # READ PROPERTIES AND CREATE POSTS
     public function publish_properties()
     {
-        $properties     = ImportImob::xml_data_to_collection_of_properties();
-        $published_ids  = ImportImob::check_properties_duplicity();
+        $properties         = ImportImob::xml_data_to_collection_of_properties();
+        $properties_code    = ImportImob::check_properties_duplicity();
 
-        foreach ($properties as $property) :
-            $property_code_id       = $property['codigo'];
-            if (!in_array($property_code_id, $published_ids)) :
+        # MAX 16 PROPERTIES POR LOOP
+        $total_prop     = count($properties);
+        if ($total_prop > 16) :
+            $properties = array_chunk($properties, 16);
+        endif;
 
-                # SETUP PROPERTY
-                $property_title         = $property['titulo'];
-                $property_description   = $property['descricao'];
-
-                $property_bedrooms      = $property['quartos'];
-                $property_bathrooms     = $property['banheiros'];
-                $property_garage        = $property['vagas'];
-                $property_size          = $property['area_util'];
-                $property_size_total    = $property['area_total'];
-                $property_size_postfix  = $property['und_metrica'];
-
-                $property_type          = $property['tipo_imovel'];
-                $property_subtype       = $property['subtipo_imovel'];
-                $property_function      = $property['finalidade'];
-                $property_category      = $property['categoria'];
-
-                $property_price         = $property['preco_venda'];
-                $property_price_sec     = $property['preco_locacao'];
-                $property_price_iptu    = $property['preco_iptu'];
-                $property_price_condon  = $property['preco_condominio'];
-                
-                $property_country       = $property['pais'];
-                $property_uf            = $property['estado'];
-                $property_city          = $property['cidade'];
-                $property_district      = $property['bairro'];
-                $property_zone          = $property['regiao'];
-                $property_street        = $property['rua'];
-                $property_number        = $property['numero'];
-                $property_cep           = $property['cep'];
-                $property_complement    = $property['complemento'];
-                $property_full_address  = $property_street . ', '. $property_number . ', ' . $property_district . ', ' . $property_city . ' - ' . $property_uf;
-
-                $property_condon        = $property['nome_condominio'];
-                $property_building      = $property['nome_edificio'];
-                $property_construction  = $property['ano_construcao'];
-                $property_features      = $property['features'];
-
-                $property_video_url     = $property['video_url'];
-                $property_gallery       = $property['fotos'];
-                
-
-                # TRATAMENTO FEATURES
-                $property_features_arr  = explode(',', $property_features);
-
-                # SETUP POST
-                $post_arr = array(
-                    'post_type'     => 'property',
-                    'post_title'    => $property_title,
-                    'post_content'  => $property_description,
-                    'post_author'   => get_current_user_id(),
-                    'post_status'   => 'publish',
-                );
-                $post_id            = wp_insert_post($post_arr, $wp_error);
-                
-                if (!is_wp_error($post_id)) :
-
-                    # SAVE THE TAXONOMIES
-                    wp_set_object_terms($post_id, array($property_type), 'property_type');
-                    wp_set_object_terms($post_id, $property_features_arr, 'property_feature');
-                    wp_set_object_terms($post_id, array($property_uf), 'property_estate');
-                    wp_set_object_terms($post_id, array($property_city), 'property_city');
-                    wp_set_object_terms($post_id, array($property_district), 'property_area');
-
-                    # SAVE METABOXES
-                    update_post_meta($post_id, 'fave_property_price', $property_price);
-                    update_post_meta($post_id, 'fave_property_sec_price', $property_price_sec);
-                    update_post_meta($post_id, 'fave_property_size', $property_size);
-                    update_post_meta($post_id, 'fave_property_size_prefix', $property_size_postfix);
-                    update_post_meta($post_id, 'fave_property_land', $property_size_total);
-                    update_post_meta($post_id, 'fave_property_bedrooms', $property_bedrooms);
-                    update_post_meta($post_id, 'fave_property_bathrooms', $property_bathrooms);
-                    update_post_meta($post_id, 'fave_property_garage', $property_garage);
-                    update_post_meta($post_id, 'fave_property_year', $property_construction);
-                    update_post_meta($post_id, 'fave_property_id', $property_code_id);
-                    update_post_meta($post_id, 'fave_property_map_address', $property_full_address);
-                    update_post_meta($post_id, 'fave_property_street', $property_street);
-                    update_post_meta($post_id, 'fave_property_zip', $property_cep);
-                    update_post_meta($post_id, 'fave_property_country', $property_country);
-                    update_post_meta($post_id, 'fave_video_url', $property_video_url);
-                    update_post_meta($post_id, 'fave_property_images', $property_gallery);
-
-                    ImportImob::set_images_properties($property_gallery, $post_id);
-                else :
-
-                    echo $post_id->get_error_message() . '<br>';
+        for ($i = 0; $i < count($properties); $i++)
+        {
+            foreach ($properties[$i] as $property) :
+                $property_code_id       = $property['codigo'];
+                if (!in_array($property_code_id, $properties_code)) :
+    
+                    # SETUP PROPERTY
+                    $property_title         = $property['titulo'];
+                    $property_description   = $property['descricao'];
+    
+                    $property_bedrooms      = $property['quartos'];
+                    $property_bathrooms     = $property['banheiros'];
+                    $property_garage        = $property['vagas'];
+                    $property_size          = $property['area_util'];
+                    $property_size_total    = $property['area_total'];
+                    $property_size_postfix  = $property['und_metrica'];
+    
+                    $property_type          = $property['tipo_imovel'];
+                    $property_subtype       = $property['subtipo_imovel'];
+                    $property_function      = $property['finalidade'];
+                    $property_category      = $property['categoria'];
+    
+                    $property_price         = $property['preco_venda'];
+                    $property_price_sec     = $property['preco_locacao'];
+                    $property_price_iptu    = $property['preco_iptu'];
+                    $property_price_condon  = $property['preco_condominio'];
+                    
+                    $property_country       = $property['pais'];
+                    $property_uf            = $property['estado'];
+                    $property_city          = $property['cidade'];
+                    $property_district      = $property['bairro'];
+                    $property_zone          = $property['regiao'];
+                    $property_street        = $property['rua'];
+                    $property_number        = $property['numero'];
+                    $property_cep           = $property['cep'];
+                    $property_complement    = $property['complemento'];
+                    $property_full_address  = $property_street . ', '. $property_number . ', ' . $property_district . ', ' . $property_city . ' - ' . $property_uf;
+    
+                    $property_condon        = $property['nome_condominio'];
+                    $property_building      = $property['nome_edificio'];
+                    $property_construction  = $property['ano_construcao'];
+                    $property_features      = $property['features'];
+    
+                    $property_video_url     = $property['video_url'];
+                    $property_gallery       = $property['fotos'];
+                    
+    
+                    # TRATAMENTO FEATURES
+                    $property_features_arr  = explode(',', $property_features);
+    
+                    # SETUP POST
+                    $post_arr = array(
+                        'post_type'     => 'property',
+                        'post_title'    => $property_title,
+                        'post_content'  => $property_description,
+                        'post_author'   => get_current_user_id(),
+                        'post_status'   => 'publish',
+                    );
+                    $post_id            = wp_insert_post($post_arr, $wp_error);
+                    
+                    if (!is_wp_error($post_id)) :
+    
+                        # SAVE THE TAXONOMIES
+                        wp_set_object_terms($post_id, array($property_type), 'property_type');
+                        wp_set_object_terms($post_id, $property_features_arr, 'property_feature');
+                        wp_set_object_terms($post_id, array($property_uf), 'property_estate');
+                        wp_set_object_terms($post_id, array($property_city), 'property_city');
+                        wp_set_object_terms($post_id, array($property_district), 'property_area');
+    
+                        # SAVE METABOXES
+                        update_post_meta($post_id, 'fave_property_price', $property_price);
+                        update_post_meta($post_id, 'fave_property_sec_price', $property_price_sec);
+                        update_post_meta($post_id, 'fave_property_size', $property_size);
+                        update_post_meta($post_id, 'fave_property_size_prefix', $property_size_postfix);
+                        update_post_meta($post_id, 'fave_property_land', $property_size_total);
+                        update_post_meta($post_id, 'fave_property_bedrooms', $property_bedrooms);
+                        update_post_meta($post_id, 'fave_property_bathrooms', $property_bathrooms);
+                        update_post_meta($post_id, 'fave_property_garage', $property_garage);
+                        update_post_meta($post_id, 'fave_property_year', $property_construction);
+                        update_post_meta($post_id, 'fave_property_id', $property_code_id);
+                        update_post_meta($post_id, 'fave_property_map_address', $property_full_address);
+                        update_post_meta($post_id, 'fave_property_street', $property_street);
+                        update_post_meta($post_id, 'fave_property_zip', $property_cep);
+                        update_post_meta($post_id, 'fave_property_country', $property_country);
+                        update_post_meta($post_id, 'fave_video_url', $property_video_url);
+                        update_post_meta($post_id, 'fave_property_images', $property_gallery);
+    
+                        ImportImob::set_images_properties($property_gallery, $post_id);
+                    else :
+    
+                        echo $post_id->get_error_message() . '<br>';
+    
+                    endif;
 
                 endif;
-            endif;
-        endforeach;
+            endforeach;
+            
+            // break;
+        }
+        
     }
 
     # SET IMAGES TO PROPERTIES BY ID
@@ -600,8 +613,8 @@ class ImportImob {
     # LOGS DA CARGA
     public function log_load_properties()
     {
-        $properties_arr     = ImportImob::xml_data_to_collection_of_properties();
-        $prop_total         = count($properties_arr);
+        $properties_arr         = ImportImob::xml_data_to_collection_of_properties();
+        $prop_total             = count($properties_arr);
 
         $apartments             = array(); # Apartamentos
         $lands                  = array(); # Terrenos
@@ -658,18 +671,87 @@ class ImportImob {
                 endif;
             endforeach;
         endif;
+        ?>
 
-        $card_total_properties = '';
+        <h3>Dados da última importação: </h3>
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <label for="">Dia e Hora:</label>
+                    </th>
+                    <td>
+                        <span>27/02/2020 - 13:45:20 PM</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Total de imóveis na carga:</label>
+                    </th>
+                    <td>
+                        <span>170 Imóvei(s)</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Apartamentos:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($apartments); ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Casas:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($houses); ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Coberturas:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($roofing); ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Terrenos:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($lands); ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Pontos comerciais:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($commercial_room); ?></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="">Imóveis à venda:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($properties_for_sale); ?></span>
+                    </td>
+                </tr> 
+                <tr>
+                    <th scope="row">
+                        <label for="">Imóveis para locação:</label>
+                    </th>
+                    <td>
+                        <span><?php echo count($properties_for_rent); ?></span>
+                    </td>
+                </tr> 
+            </tbody>
+        </table>
 
-        // echo $prop_total;
-        echo 'DADOS DA ÚLTIMA IMPORTAÇÃO: <br>';
-        echo "TOTAL DE APARTAMENTOS: " . count($apartments) . '<br>';
-        echo "TOTAL DE CASAS: " . count($houses) . '<br>';
-        echo "TOTAL DE COBERTURAS: " . count($roofing) . '<br>';
-        echo "TOTAL DE TERRENOS: " . count($lands) . '<br>';
-        echo "TOTAL DE PONTOS COMERCIAIS: " . count($commercial_room) . '<br>';
-        echo "TOTAL DE IMÓVEIS Á VENDA: " . count($properties_for_sale) . '<br>';
-        echo "TOTAL DE IMÓVEIS PARA LOCAÇÃO: " . count($properties_for_rent) . '<br>';
+        <?php
     }
 }
 
