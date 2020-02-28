@@ -40,8 +40,15 @@ class ImportImob {
 
         # CRON JOB
         add_filter('cron_schedules', array($this, 'setup_cronjob_interval'));
+        if ( ! wp_next_scheduled( 'cron_publish_properties' ) ) :
+            wp_schedule_event( time(), 'custom_interval', 'cron_publish_properties' );
+        endif;
         add_action('cron_publish_properties', array($this, 'publish_properties'));
-        #add_action('admin_enqueue_scripts', array($this, 'register_and_enqueue_scripts'));
+
+        if (!wp_next_scheduled('cron_update_properties')) :
+            wp_schedule_event(time(), 'update_gallery_interval', 'cron_update_properties');            
+        endif;
+        add_action('cron_update_properties', array($this, 'update_properties'));
 
         # ENQUEUE AWESOME FONTS
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts_admin'));
