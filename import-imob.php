@@ -76,6 +76,8 @@ class ImportImob {
         register_setting($option_group, PREFIX . '_timestamp');
         register_setting($option_group, PREFIX . '_url_load');
         register_setting($option_group, PREFIX . '_imgs_total');
+        register_setting($option_group, PREFIX . 'ids_to_exlude_up_to_date');
+        register_setting($option_group, PREFIX . '_last_time');
     }
 
     # FORM FOR SETTINGS INPUTS
