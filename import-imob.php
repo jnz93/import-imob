@@ -515,10 +515,16 @@ class ImportImob {
 
                 endif;
             endforeach;
-            
-            // break;
         }
+
+        $time_execution = getdate();
+        $data   = $time_execution['mday'] . '/' . $time_execution['mon'] . '/' . $time_execution['year'];
+        $hora   = $time_execution['hours'] . ':' . $time_execution['minutes'] . ':' . $time_execution['seconds'];
+        $time_execution = $data . ' - ' . $hora;
+        update_option(PREFIX . '_last_time', $time_execution);
         
+    }
+
     }
 
     # SET IMAGES TO PROPERTIES BY ID
