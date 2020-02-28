@@ -3,7 +3,7 @@
  * Plugin name: Import Imob
  * Plugin URI: 
  * Description: Importe imóveis da plataforma Ingaia Imob via XML e transforme em publicações no seu portal.
- * Version: 1.0.0
+ * Version: 1.4.1
  * Author: JA93
  * Author URI: http://unitycode.tech
  * Text domain: import-imob
@@ -506,7 +506,7 @@ class ImportImob {
                         update_post_meta($post_id, 'fave_video_url', $property_video_url);
                         update_post_meta($post_id, 'fave_property_images', $property_gallery);
     
-                        ImportImob::set_images_properties($property_gallery, $post_id);
+                        #ImportImob::set_images_properties($property_gallery, $post_id);
                     else :
     
                         echo $post_id->get_error_message() . '<br>';
@@ -525,6 +525,39 @@ class ImportImob {
         
     }
 
+
+    # UPDATE GALLERY OF PHOTOS
+    public function update_properties()
+    {
+        $curr_ids_up_to_date    = get_option(PREFIX . 'ids_to_exlude_up_to_date');
+        $arr_up_to_date         = explode(',', $curr_ids_up_to_date);
+        $ids_to_exclude         = '';
+
+        $args = array(
+            'post_type'     => 'property',
+            'numberposts'   => 10,
+            'exclude'       => $arr_up_to_date,
+        );
+        $properties     = get_posts($args);
+
+        if (empty($properties)) :
+            exit;
+        endif;
+
+        foreach ($properties as $property) :
+           setup_postdata($property);
+
+            $prop_id    = $property->ID;
+            $url_imgs   = get_post_meta($prop_id, 'fave_property_images', true);
+
+            ImportImob::set_images_properties($url_imgs, $prop_id);           
+
+            $ids_to_exclude .= ',' . $prop_id;
+        endforeach;
+        wp_reset_postdata();
+
+        $ids_to_exclude .= $curr_ids_up_to_date;
+        update_option(PREFIX . 'ids_to_exlude_up_to_date', $ids_to_exclude);
     }
 
     # SET IMAGES TO PROPERTIES BY ID
@@ -550,6 +583,8 @@ class ImportImob {
         $attachs_arr = explode(', ', $attachs_ids);
         $thumbnail_id = $attachs_arr[0];        
         set_post_thumbnail($post_id, $thumbnail_id);
+
+        echo $post_id . ' Up-to-date <br>';
     }
 
     
@@ -584,6 +619,7 @@ class ImportImob {
         }
         return $attachmentId;
     }
+
     # SETUP CRONJOB INTERVAL AND EXECUTION
     public function setup_cronjob_interval($schedules)
     {
@@ -633,6 +669,7 @@ class ImportImob {
     # LOGS DA CARGA
     public function log_load_properties()
     {
+        $last_time              = get_option(PREFIX . '_last_time');
         $properties_arr         = ImportImob::xml_data_to_collection_of_properties();
         $prop_total             = count($properties_arr);
 
@@ -698,10 +735,10 @@ class ImportImob {
             <tbody>
                 <tr>
                     <th scope="row">
-                        <label for="">Dia e Hora:</label>
+                        <label for="">Data: </label>
                     </th>
                     <td>
-                        <span>27/02/2020 - 13:45:20 PM</span>
+                        <span><?php echo $last_time ?></span>
                     </td>
                 </tr>
                 <tr>
@@ -709,7 +746,7 @@ class ImportImob {
                         <label for="">Total de imóveis na carga:</label>
                     </th>
                     <td>
-                        <span>170 Imóvei(s)</span>
+                        <span><?php echo $prop_total ?> imóvel(is)</span>
                     </td>
                 </tr>
                 <tr>
