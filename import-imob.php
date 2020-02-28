@@ -593,6 +593,11 @@ class ImportImob {
             'interval'  => $custom_interval,
             'display'   => esc_html__( 'Every ' . $custom_interval . ' seconds.' ),
         );
+
+        $schedules['update_gallery_interval'] = array(
+            'interval'  => 1800,
+            'display'   => esc_html__('Every 30 Minutes')
+        );
         
         return $schedules;
     }
