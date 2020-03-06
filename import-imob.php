@@ -3,7 +3,7 @@
  * Plugin name: Import Imob
  * Plugin URI: 
  * Description: Importe imóveis da plataforma Ingaia Imob via XML e transforme em publicações no seu portal.
- * Version: 1.4.1
+ * Version: 1.5.0
  * Author: JA93
  * Author URI: http://unitycode.tech
  * Text domain: import-imob
@@ -482,29 +482,22 @@ class ImportImob {
                     if (!is_wp_error($post_id)) :
     
                         # SAVE THE TAXONOMIES
-                        wp_set_object_terms($post_id, array($property_type), 'property_type');
-                        wp_set_object_terms($post_id, $property_features_arr, 'property_feature');
-                        wp_set_object_terms($post_id, array($property_uf), 'property_estate');
-                        wp_set_object_terms($post_id, array($property_city), 'property_city');
-                        wp_set_object_terms($post_id, array($property_district), 'property_area');
+                        wp_set_object_terms($post_id, array($property_type), 'property-type');
+                        wp_set_object_terms($post_id, $property_features_arr, 'property-feature');
+                        wp_set_object_terms($post_id, array($property_city), 'property-city');
     
                         # SAVE METABOXES
-                        update_post_meta($post_id, 'fave_property_price', $property_price);
-                        update_post_meta($post_id, 'fave_property_sec_price', $property_price_sec);
-                        update_post_meta($post_id, 'fave_property_size', $property_size);
-                        update_post_meta($post_id, 'fave_property_size_prefix', $property_size_postfix);
-                        update_post_meta($post_id, 'fave_property_land', $property_size_total);
-                        update_post_meta($post_id, 'fave_property_bedrooms', $property_bedrooms);
-                        update_post_meta($post_id, 'fave_property_bathrooms', $property_bathrooms);
-                        update_post_meta($post_id, 'fave_property_garage', $property_garage);
-                        update_post_meta($post_id, 'fave_property_year', $property_construction);
-                        update_post_meta($post_id, 'fave_property_id', $property_code_id);
-                        update_post_meta($post_id, 'fave_property_map_address', $property_full_address);
-                        update_post_meta($post_id, 'fave_property_street', $property_street);
-                        update_post_meta($post_id, 'fave_property_zip', $property_cep);
-                        update_post_meta($post_id, 'fave_property_country', $property_country);
-                        update_post_meta($post_id, 'fave_video_url', $property_video_url);
-                        update_post_meta($post_id, 'fave_property_images', $property_gallery);
+                        update_post_meta($post_id, 'REAL_HOMES_property_price', $property_price);
+                        update_post_meta($post_id, 'REAL_HOMES_property_size', $property_size);
+                        update_post_meta($post_id, 'REAL_HOMES_property_size_postfix', $property_size_postfix);
+                        update_post_meta($post_id, 'REAL_HOMES_property_bedrooms', $property_bedrooms);
+                        update_post_meta($post_id, 'REAL_HOMES_property_bathrooms', $property_bathrooms);
+                        update_post_meta($post_id, 'REAL_HOMES_property_garage', $property_garage);
+                        update_post_meta($post_id, 'REAL_HOMES_property_year_built', $property_construction);
+                        update_post_meta($post_id, 'property_custom_id', $property_code_id); # ID para checar duplicidade
+                        update_post_meta($post_id, 'REAL_HOMES_property_id', $property_code_id); # ID Oficial
+                        update_post_meta($post_id, 'REAL_HOMES_property_address', $property_full_address);
+                        update_post_meta($post_id, 'REAL_HOMES_property_images', $property_gallery);
     
                         #ImportImob::set_images_properties($property_gallery, $post_id);
                     else :
@@ -548,7 +541,7 @@ class ImportImob {
            setup_postdata($property);
 
             $prop_id    = $property->ID;
-            $url_imgs   = get_post_meta($prop_id, 'fave_property_images', true);
+            $url_imgs   = get_post_meta($prop_id, 'REAL_HOMES_property_images', true);
 
             ImportImob::set_images_properties($url_imgs, $prop_id);           
 
@@ -577,20 +570,21 @@ class ImportImob {
                 $attachs_ids        .= $attach_id . ', ';
             endif;
         endforeach;
-        update_post_meta($post_id, 'fave_property_images', $attachs_ids);
+        update_post_meta($post_id, 'REAL_HOMES_property_images', $attachs_ids);
 
         # SET THUMBNAIL
         $attachs_arr = explode(', ', $attachs_ids);
         $thumbnail_id = $attachs_arr[0];        
         set_post_thumbnail($post_id, $thumbnail_id);
 
-        echo $post_id . ' Up-to-date <br>';
+        // echo $post_id . ' Up-to-date <br>';
     }
 
     
     public function upload_image($url, $post_id) 
     {
         $image = "";
+        $attachmentId = "";
         if($url != "") {
          
             $file = array();
@@ -655,7 +649,7 @@ class ImportImob {
             while ($properties_published->have_posts()) :
                 $properties_published->the_post();
                 $post_id = get_the_ID();
-                $property_id = get_post_meta($post_id, 'fave_property_id', true);
+                $property_id = get_post_meta($post_id, 'property_custom_id', true);
 
                 $published_ids[] = $property_id;
 
