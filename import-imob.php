@@ -464,6 +464,7 @@ class ImportImob {
     
                     $property_video_url     = $property['video_url'];
                     $property_gallery       = $property['fotos'];
+                    $property_code_id       = $property['codigo'];
                     
     
                     # TRATAMENTO FEATURES
