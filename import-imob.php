@@ -3,7 +3,7 @@
  * Plugin name: Import Imob
  * Plugin URI: 
  * Description: Importe imóveis da plataforma Ingaia Imob via XML e transforme em publicações no seu portal.
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: JA93
  * Author URI: http://unitycode.tech
  * Text domain: import-imob
@@ -52,6 +52,9 @@ class ImportImob {
 
         # ENQUEUE AWESOME FONTS
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts_admin'));
+
+        # CREATE TAXONOMIES
+        add_action('init', array($this, 'create_custom_taxonomies'));
     }
 
     # MENU WORDPRESS
@@ -486,6 +489,7 @@ class ImportImob {
                         wp_set_object_terms($post_id, array($property_type), 'property-type');
                         wp_set_object_terms($post_id, $property_features_arr, 'property-feature');
                         wp_set_object_terms($post_id, array($property_city), 'property-city');
+                        wp_set_object_terms($post_id, array($property_district), 'property_neighborhood');
     
                         # SAVE METABOXES
                         update_post_meta($post_id, 'REAL_HOMES_property_price', $property_price);
@@ -804,6 +808,38 @@ class ImportImob {
         </table>
 
         <?php
+    }
+
+    # CREATE TAXONOMIES
+    public function create_custom_taxonomies()
+    {
+        $singular_name  = "Bairro";
+        $plural_name    = "Bairros";
+        $taxonomy_name  = "property_neighborhood";
+        $labels = array(
+            'name'              => _x( $plural_name, 'taxonomy general name', 'textdomain' ),
+            'singular_name'     => _x( $singular_name, 'taxonomy singular name', 'textdomain' ),
+            'search_items'      => __( 'Search ' . $plural_name, 'textdomain' ),
+            'all_items'         => __( 'All ' . $plural_name, 'textdomain' ),
+            'parent_item'       => __( 'Parent ' . $singular_name, 'textdomain' ),
+            'parent_item_colon' => __( 'Parent ' . $singular_name . ':', 'textdomain' ),
+            'edit_item'         => __( 'Edit ' . $singular_name, 'textdomain' ),
+            'update_item'       => __( 'Update ' . $singular_name, 'textdomain' ),
+            'add_new_item'      => __( 'Add New ' . $singular_name, 'textdomain' ),
+            'new_item_name'     => __( 'New '. $singular_name .' Name', 'textdomain' ),
+            'menu_name'         => __( $plural_name, 'textdomain' ),
+        );
+     
+        $args = array(
+            'hierarchical'      => true,
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'property-neighborhood' ),
+        );
+     
+        register_taxonomy( $taxonomy_name, array( 'property' ), $args );
     }
 }
 
