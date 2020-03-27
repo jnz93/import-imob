@@ -490,6 +490,17 @@ class ImportImob {
                         wp_set_object_terms($post_id, $property_features_arr, 'property-feature');
                         wp_set_object_terms($post_id, array($property_city), 'property-city');
                         wp_set_object_terms($post_id, array($property_district), 'property_neighborhood');
+
+                        # CHECK SALE or LOCATION and set Term
+                        if (empty($property_price_sec) && !empty($property_price)) :
+
+                            wp_set_object_terms($post_id, array('Compra'), 'property-status');
+
+                        else :
+
+                            wp_set_object_terms($post_id, array('Aluguel'), 'property-status');
+
+                        endif;
     
                         # SAVE METABOXES
                         update_post_meta($post_id, 'REAL_HOMES_property_price', $property_price);
