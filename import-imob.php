@@ -515,6 +515,7 @@ class ImportImob {
                         update_post_meta($post_id, 'REAL_HOMES_property_id', $property_code_id); # ID Oficial
                         update_post_meta($post_id, 'REAL_HOMES_property_address', $property_full_address);
                         update_post_meta($post_id, 'REAL_HOMES_property_images', $property_gallery);
+                        update_post_meta($post_id, 'inspiry_bairro', $property_district);
     
                         #ImportImob::set_images_properties($property_gallery, $post_id);
                     else :
