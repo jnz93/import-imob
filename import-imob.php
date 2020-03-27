@@ -511,6 +511,7 @@ class ImportImob {
                         update_post_meta($post_id, 'REAL_HOMES_property_garage', $property_garage);
                         update_post_meta($post_id, 'REAL_HOMES_property_year_built', $property_construction);
                         update_post_meta($post_id, 'property_custom_id', $property_code_id); # ID para checar duplicidade
+                        update_post_meta($post_id, 'inspiry_ref._imóvel', $property_code_id); # ID para checar duplicidade
                         update_post_meta($post_id, 'REAL_HOMES_property_id', $property_code_id); # ID Oficial
                         update_post_meta($post_id, 'REAL_HOMES_property_address', $property_full_address);
                         update_post_meta($post_id, 'REAL_HOMES_property_images', $property_gallery);
