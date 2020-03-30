@@ -429,6 +429,7 @@ class ImportImob {
         for ($i = 0; $i < count($properties); $i++)
         {
             foreach ($properties[$i] as $property) :
+                $arr_of_realtors        = ImportImob::get_realtors();
                 $property_code_id       = $property['codigo'];
                 if (!in_array($property_code_id, $properties_code)) :
     
@@ -683,6 +684,32 @@ class ImportImob {
 
         # RETORNO IDS PUBLICADOS
         return $published_ids;    
+    }
+
+    /**
+     * Function get_realtors()
+     * @return $arr_of_realtors name's
+     */
+    public function get_realtors()
+    {
+        $arr_of_realtors    = array();
+        $args = array(
+            'post_type'     => 'agent',
+            'post_status'   => 'publish',
+            'numberposts'   => '-1'
+        );
+        $posts = get_posts($args);
+
+        if ($posts) :
+            foreach($posts as $agent) :
+                setup_postdata($agent);
+                $name_agent         = get_the_title($agent->ID);
+                $arr_of_realtors[]  = $name_agent;
+            endforeach;
+            wp_reset_postdata();
+        endif;
+
+        return $arr_of_realtors;
     }
 
     # LOGS DA CARGA
