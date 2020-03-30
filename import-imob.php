@@ -532,6 +532,8 @@ class ImportImob {
     
                     endif;
 
+                    # Create agent
+                    ImportImob::register_realtor($property_realtor_name, $property_realtor_phone, $property_realtor_email, $arr_of_realtors);
                 endif;
             endforeach;
         }
@@ -710,6 +712,41 @@ class ImportImob {
         endif;
 
         return $arr_of_realtors;
+    }
+
+    /**
+     * Function register_realtor()
+     * 
+     * @param $realtor_name = string name realtor
+     * @param $realtor_phone = string phone number
+     * @param $realtor_email = string realtor email
+     * @param $arr_of_realtors = arr of realtors
+     * 
+     * @return $realtor_id;
+     */
+    public function register_realtor($realtor_name, $realtor_phone, $realtor_email, $arr_of_realtors)
+    {        
+        if (!in_array($realtor_name, $arr_of_realtors)) :
+            # SETUP AND INSERT AGENT
+            $post_agent = array(
+                'post_type'     => 'agent',
+                'post_title'    => $realtor_name,
+                'post_author'   => get_current_user_id(),
+                'post_status'   => 'publish',
+            );
+            $realtor_id = wp_insert_post($post_agent, $wp_error);
+            
+            if (!is_wp_error($realtor_id)) :
+                // echo $realtor_id . ' - ' . $realtor_name . ': criado com sucesso! <br>';
+
+                update_post_meta($realtor_id, 'REAL_HOMES_mobile_number', $realtor_phone);
+                update_post_meta($realtor_id, 'REAL_HOMES_agent_email', $realtor_email);
+
+                return $realtor_id;
+            else :
+                echo $realtor_id->get_error_message() . '<br>';
+            endif;
+        endif;
     }
 
     # LOGS DA CARGA
