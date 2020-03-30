@@ -374,6 +374,10 @@ class ImportImob {
             $properties_to_publish[$index]['video_url']         = (string) $property->LinkVideo;
             $properties_to_publish[$index]['codigo']            = (string) $property->CodigoImovel;
 
+            $properties_to_publish[$index]['corretor_nome']     = utf8_decode((string) $property->corretor->nome);
+            $properties_to_publish[$index]['corretor_email']    = utf8_decode((string) $property->corretor->email);
+            $properties_to_publish[$index]['corretor_celular']  = utf8_decode((string) $property->corretor->celular);
+
             # FEATURES
             $properties_to_publish[$index]['features']          = '';
             foreach ($properties_features as $feature) :
@@ -469,11 +473,14 @@ class ImportImob {
                     $property_gallery       = $property['fotos'];
                     $property_code_id       = $property['codigo'];
                     
+                    $property_realtor_name  = $property['corretor_nome'];
+                    $property_realtor_email = $property['corretor_email'];
+                    $property_realtor_phone = $property['corretor_celular'];
     
                     # TRATAMENTO FEATURES
                     $property_features_arr  = explode(',', $property_features);
     
-                    # SETUP POST
+                    # SETUP AND INSERT PROPERTY
                     $post_arr = array(
                         'post_type'     => 'property',
                         'post_title'    => $property_title,
@@ -482,7 +489,7 @@ class ImportImob {
                         'post_status'   => 'publish',
                     );
                     $post_id            = wp_insert_post($post_arr, $wp_error);
-                    
+
                     if (!is_wp_error($post_id)) :
     
                         # SAVE THE TAXONOMIES
