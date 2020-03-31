@@ -749,6 +749,28 @@ class ImportImob {
         endif;
     }
 
+    /**
+     * Function get_realtor_ID_by_title()
+     * @uses $wpdb
+     * 
+     * @param string $realtor_name
+     * @return int $realtor->ID;
+     */
+    public function get_realtor_ID_by_title($realtor_name)
+    {
+        global $wpdb;
+        $post_type = 'agent';
+
+        $post = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_title = %s AND post_type = %s", $realtor_name, $post_type));
+
+        if ($post) :
+            $realtor = get_post($post, $output);
+            return $realtor->ID;
+        else :
+            return null;
+        endif;
+    }
+
     # LOGS DA CARGA
     public function log_load_properties()
     {
